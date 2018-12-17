@@ -2,10 +2,12 @@ package net.simplyrin.konomiiplogger;
 
 import java.io.File;
 import java.text.Normalizer;
+import java.util.Arrays;
 
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -62,6 +64,8 @@ public class Main extends Plugin implements Listener, Request.Callback {
 			Configuration config = Config.getConfig(file);
 
 			config.set("Console-Debug", false);
+			config.set("Whitelist-CountryCode", Arrays.asList("JP"));
+			config.set("Kick-Message", "&c&lYou can not access the server from your country!");
 
 			config.set("MySQL.Use", false);
 
@@ -120,6 +124,10 @@ public class Main extends Plugin implements Listener, Request.Callback {
 
 		if (this.consoleDebug) {
 			this.sendMessage("Callback... : " + player.getName());
+		}
+
+		if (!this.config.getStringList("Whitelist-CountryCode").contains(result.getCountryCode())) {
+			player.disconnect(new TextComponent(ChatColor.translateAlternateColorCodes('&', this.config.getString("Kick-Message"))));
 		}
 
 		String key = player.getUniqueId().toString();
