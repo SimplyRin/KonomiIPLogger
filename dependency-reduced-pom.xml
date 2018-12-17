@@ -4,7 +4,7 @@
   <groupId>net.simplyrin.konomiiplogger</groupId>
   <artifactId>KonomiIPLogger</artifactId>
   <name>KonomiIPLogger</name>
-  <version>1.1</version>
+  <version>1.2</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>

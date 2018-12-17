@@ -68,8 +68,7 @@ public class MySQLManager {
 	public void autoReconnect() {
 		try {
 			TimeUnit.MINUTES.sleep(30);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 
 		try {

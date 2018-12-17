@@ -3,8 +3,10 @@ package net.simplyrin.konomiiplogger.utils;
 import club.sk1er.utils.HttpClient;
 import club.sk1er.utils.JsonHolder;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.simplyrin.konomiiplogger.Main;
+import net.simplyrin.konomiiplogger.event.KonomiIPCheckEvent;
+import net.simplyrin.konomiiplogger.event.KonomiIPInfo;
 import net.simplyrin.threadpool.ThreadPool;
 
 /**
@@ -25,17 +27,16 @@ import net.simplyrin.threadpool.ThreadPool;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@AllArgsConstructor
 public class Request {
 
+	private Main instance;
 	private ProxiedPlayer player;
 
-	public Request(ProxiedPlayer player) {
-		this.player = player;
-	}
-
-	public void postRequest(Callback callback) {
+	public void postRequest() {
 		ThreadPool.run(() -> {
 			String address = this.player.getAddress().getHostString();
+
 			String raw = HttpClient.rawWithAgent("http://ip-api.com/json/" + address);
 			JsonHolder jsonHolder = new JsonHolder(raw);
 
@@ -54,34 +55,12 @@ public class Request {
 			String timezone = jsonHolder.optString("timezone");
 			String zip = jsonHolder.optString("zip");
 
-			Result result = new Result(this.player, as, city, country, countryCode, isp, lat, lon, org, query, region, regionName, status, timezone, zip);
+			KonomiIPInfo result = new KonomiIPInfo(this.player, as, city, country, countryCode, isp, lat, lon, org, query, region, regionName, status, timezone, zip);
 
-			callback.onDone(result);
+			// callback.onDone(result);
+
+			this.instance.getProxy().getPluginManager().callEvent(new KonomiIPCheckEvent(this.player, result));
 		});
-	}
-
-	public interface Callback {
-		public void onDone(Result result);
-	}
-
-	@Getter
-	@AllArgsConstructor
-	public class Result {
-		private ProxiedPlayer player;
-		private String as;
-		private String city;
-		private String country;
-		private String countryCode;
-		private String isp;
-		private double lat;
-		private double lon;
-		private String org;
-		private String query;
-		private String region;
-		private String regionName;
-		private String status;
-		private String timezone;
-		private String zip;
 	}
 
 }
